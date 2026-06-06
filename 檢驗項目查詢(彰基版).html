@@ -14,6 +14,16 @@
   --border:#D8D6D0;--border2:#B8B6B0;
   --accent:#1A6B4A;--accent-light:#E4F4EC;--accent-mid:#9DD4B8;
 }
+[data-theme="dark"]{
+  --bg:#0A1628;--surface:#112036;--surface2:#172B45;
+  --text:#C8E6FF;--text2:#6B93B4;--text3:#3A5570;
+  --border:#1E3A5F;--border2:#2A5080;
+  --accent:#38BDF8;--accent-light:#0C2D45;--accent-mid:#1565A0;--accent-dark:#7DD3FC;
+}
+.header-title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.header-title{font-size:14px;font-weight:700;color:var(--accent);letter-spacing:.04em}
+.theme-btn{height:26px;padding:0 10px;border:1.5px solid var(--border);border-radius:20px;background:var(--surface2);cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s}
+.theme-btn:hover{border-color:var(--border2);background:var(--surface)}
 body{font-family:"Noto Sans TC",sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px 14px;position:sticky;top:0;z-index:100}
 .search-row{display:flex;gap:8px;align-items:center}
@@ -77,6 +87,10 @@ body{font-family:"Noto Sans TC",sans-serif;background:var(--bg);color:var(--text
 </head>
 <body>
 <div class="header">
+  <div class="header-title-row">
+    <span class="header-title">🔬 彰化秀傳紀念醫院 檢驗項目查詢</span>
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="切換顯示模式">☀️</button>
+  </div>
   <div class="search-row">
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
@@ -227,6 +241,19 @@ function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace
 function closeModal(){document.getElementById('ov').classList.remove('open');}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 render();
+function toggleTheme(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',isDark?'light':'dark');
+  document.getElementById('theme-btn').textContent=isDark?'☀️':'🌙';
+  localStorage.setItem('theme',isDark?'light':'dark');
+}
+(function(){
+  const saved=localStorage.getItem('theme');
+  if(saved==='dark'){
+    document.documentElement.setAttribute('data-theme','dark');
+    document.getElementById('theme-btn').textContent='🌙';
+  }
+})();
 </script>
 </body>
 </html>
