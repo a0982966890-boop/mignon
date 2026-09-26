@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>醫學檢驗實驗室庫存自動化管理系統</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Serif TC', 'Georgia', serif;
+    background: #f8f7f4;
+    color: #1a1a1a;
+    line-height: 1.8;
+  }
+
+  /* 頂部標題區 */
+  .hero {
+    background: #0f2d4a;
+    color: #fff;
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+  }
+  .hero-label {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: #7eb8d4;
+    margin-bottom: 1.25rem;
+  }
+  .hero h1 {
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 400;
+    line-height: 1.4;
+    max-width: 640px;
+    margin: 0 auto 1.25rem;
+  }
+  .hero-sub {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.95rem;
+    color: #a8c8dc;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* 核心數據橫幅 */
+  .stats-bar {
+    background: #1a4a6b;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    text-align: center;
+    color: #fff;
+  }
+  .stat-num {
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: #7eb8d4;
+    display: block;
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.75rem;
+    color: #a8c8dc;
+    margin-top: 0.35rem;
+  }
+
+  /* 主體內容 */
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  /* 章節通用 */
+  section {
+    padding: 3.5rem 0;
+    border-bottom: 0.5px solid #ddd;
+  }
+  section:last-child { border-bottom: none; }
+
+  .section-eyebrow {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: #1a4a6b;
+    margin-bottom: 0.75rem;
+  }
+  h2 {
+    font-size: 1.45rem;
+    font-weight: 400;
+    margin-bottom: 1.25rem;
+    color: #0f2d4a;
+  }
+  h3 {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1a4a6b;
+    margin: 1.75rem 0 0.5rem;
+  }
+  p {
+    font-size: 0.975rem;
+    color: #333;
+    margin-bottom: 1rem;
+    max-width: 68ch;
+  }
+
+  /* 角色分工卡片 */
+  .role-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .role-card {
+    background: #fff;
+    border: 0.5px solid #d0dce6;
+    border-radius: 10px;
+    padding: 1.25rem;
+  }
+  .role-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+  }
+  .role-icon.director { background: #e6f1fb; }
+  .role-icon.leader   { background: #eaf3de; }
+  .role-icon.operator { background: #faeeda; }
+
+  .role-title {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #0f2d4a;
+    margin-bottom: 0.5rem;
+  }
+  .role-desc {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.8rem;
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* 流程時間軸 */
+  .timeline {
+    margin-top: 1.5rem;
+    position: relative;
+    padding-left: 1.5rem;
+    border-left: 1.5px solid #b8d0e0;
+  }
+  .timeline-item {
+    margin-bottom: 1.75rem;
+    position: relative;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.95rem;
+    top: 0.35rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #1a4a6b;
+  }
+  .timeline-time {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.7rem;
+    color: #1a4a6b;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.25rem;
+  }
+  .timeline-title {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #0f2d4a;
+    margin-bottom: 0.3rem;
+  }
+  .timeline-desc {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.8rem;
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 56ch;
+  }
+  .timeline-badge {
+    display: inline-block;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+  .badge-auto { background: #e6f1fb; color: #185fa5; }
+  .badge-manual { background: #eaf3de; color: #3b6d11; }
+
+  /* 功能模組清單 */
+  .module-list {
+    margin-top: 1.25rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .module-item {
+    background: #fff;
+    border: 0.5px solid #d0dce6;
+    border-left: 3px solid #1a4a6b;
+    border-radius: 0 8px 8px 0;
+    padding: 0.9rem 1.1rem;
+  }
+  .module-name {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #0f2d4a;
+    margin-bottom: 0.25rem;
+  }
+  .module-detail {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.78rem;
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* 風控與稽核表格 */
+  .audit-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.25rem;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.82rem;
+  }
+  .audit-table th {
+    background: #0f2d4a;
+    color: #fff;
+    padding: 0.65rem 1rem;
+    text-align: left;
+    font-weight: 500;
+  }
+  .audit-table td {
+    padding: 0.65rem 1rem;
+    border-bottom: 0.5px solid #e0e8ef;
+    color: #333;
+    vertical-align: top;
+  }
+  .audit-table tr:nth-child(even) td { background: #f4f8fb; }
+
+  /* 技術需求區塊 */
+  .req-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+  .req-block {
+    background: #fff;
+    border: 0.5px solid #d0dce6;
+    border-radius: 10px;
+    padding: 1.1rem;
+  }
+  .req-block-title {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.78rem;
+    color: #1a4a6b;
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+  }
+  .req-block ul {
+    padding-left: 1.1rem;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.78rem;
+    color: #444;
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* 實施建議 */
+  .phase-steps {
+    margin-top: 1.25rem;
+    counter-reset: phase;
+  }
+  .phase-step {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    align-items: flex-start;
+  }
+  .phase-num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #0f2d4a;
+    color: #fff;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.1rem;
+  }
+  .phase-content-title {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #0f2d4a;
+    margin-bottom: 0.25rem;
+  }
+  .phase-content-desc {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.8rem;
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* 頁尾 */
+  footer {
+    background: #0f2d4a;
+    color: #7eb8d4;
+    text-align: center;
+    padding: 2rem;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.75rem;
+    line-height: 1.8;
+  }
+
+  @media (max-width: 600px) {
+    .stats-bar { gap: 1.5rem; }
+    .req-grid { grid-template-columns: 1fr; }
+    .role-grid { grid-template-columns: 1fr; }
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- 頂部標題 -->
+<div class="hero">
+  <p class="hero-label">醫學檢驗科 · 庫存管理現代化</p>
+  <h1>Beckman Coulter 試劑庫存<br>自動化管理系統</h1>
+  <p class="hero-sub">從每日盤點、低庫存預警、訂單生成到試劑入庫，以 Python 自動化串接保吉系統與 Google Workspace，大幅降低人工作業負擔。</p>
+</div>
+
+<!-- 核心數據 -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <span class="stat-num">8</span>
+    <span class="stat-label">自動化腳本</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">每日</span>
+    <span class="stat-label">自動庫存盤點</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">3 種</span>
+    <span class="stat-label">訂單類型整合</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">AI</span>
+    <span class="stat-label">出貨單自動辨識</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- 一、系統背景 -->
+  <section>
+    <p class="section-eyebrow">背景說明</p>
+    <h2>為什麼實驗室需要這套系統？</h2>
+    <p>醫學檢驗科的試劑庫存管理，長期面臨幾個重複性高、卻又不容出錯的挑戰：每日需手動登入庫存系統確認存量、在警戒值以下的品項需要人工比對再下訂單、Beckman 出貨單需要手動逐筆輸入入庫資訊、每個月初需要手動建立新的試算表追蹤記錄。</p>
+    <p>這套自動化系統的核心思路，是把所有「每次做法都一樣」的重複步驟交給程式自動完成，讓檢驗師的時間回歸到需要專業判斷的工作上，同時保留關鍵的人工確認節點，避免因自動化程度過高而失去稽核能力。</p>
+  </section>
+
+  <!-- 二、各層角色說明 -->
+  <section>
+    <p class="section-eyebrow">使用者角色</p>
+    <h2>系統對不同層級的意義</h2>
+    <p>這套系統的設計兼顧了實驗室三個層級的需求，主管看到的是整體庫存風險，組長看到的是日常操作效率，儀器主要負責人則直接受益於減少重複性手動作業。</p>
+
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-icon director">🏥</div>
+        <div class="role-title">實驗室主管</div>
+        <p class="role-desc">透過 LINE 推播即時掌握新增低庫存品項。月底可直接查看 Google 試算表的完整庫存趨勢與短效期清單，作為採購預算與風險管理的依據，不需要每天登入系統查閱。</p>
+      </div>
+      <div class="role-card">
+        <div class="role-icon leader">📋</div>
+        <div class="role-title">組長</div>
+        <p class="role-desc">每日盤點結果自動寫入 Google 試算表，低庫存品項清單自動彙整。每月固定的耗材訂單與 DXI 專車訂單，調整數量後即可一鍵觸發，不需要手動逐筆操作保吉系統。</p>
+      </div>
+      <div class="role-card">
+        <div class="role-icon operator">🔬</div>
+        <div class="role-title">儀器主要負責人</div>
+        <p class="role-desc">Beckman 出貨單上傳 Google Drive 後，AI 自動辨識轉換為試算表格式，人工確認資料正確後執行入庫，免去手動逐筆輸入批號、效期、數量的重複作業。新批號說明書連結也會自動搜尋帶入。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 三、每日作業流程 -->
+  <section>
+    <p class="section-eyebrow">作業流程</p>
+    <h2>系統每日如何運作？</h2>
+    <p>系統的主幹是一條每日自動執行的流程，搭配數個人工手動觸發的節點。自動的部分負責監控與彙整，需要人工判斷的步驟（例如確認 AI 辨識結果、確認訂單內容後再下單）則保留手動觸發，確保稽核責任清楚。</p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <p class="timeline-time">每日 07:30</p>
+        <p class="timeline-title">庫存自動盤點 <span class="timeline-badge badge-auto">自動</span></p>
+        <p class="timeline-desc">登入保吉庫存系統，抓取免疫 Beckman DxI 800 所有試劑的今日存量，與昨日比對計算差異量，結果寫入當月 Google 試算表對應的日期分頁。</p>
+      </div>
+      <div class="timeline-item">
+        <p class="timeline-time">盤點完成後</p>
+        <p class="timeline-title">低庫存預警通知 <span class="timeline-badge badge-auto">自動</span></p>
+        <p class="timeline-desc">比對每個品項的警戒值設定，若有新增的低庫存品項（原本充足、今天才跌破警戒值），立即透過 LINE 推播通知，並更新「低庫存補貨清單」分頁。</p>
+      </div>
+      <div class="timeline-item">
+        <p class="timeline-time">收到通知後</p>
+        <p class="timeline-title">急訂單下單 <span class="timeline-badge badge-manual">手動觸發</span></p>
+        <p class="timeline-desc">確認低庫存清單後，在 GitHub Actions 手動觸發急訂單 workflow，系統自動逐筆搜尋品項、填入訂購量、送出。執行完成後印出已送出、已跳過（數量為 0）、失敗三組統計摘要。</p>
+      </div>
+      <div class="timeline-item">
+        <p class="timeline-time">貨到時</p>
+        <p class="timeline-title">PDF 出貨單辨識 <span class="timeline-badge badge-manual">手動觸發</span></p>
+        <p class="timeline-desc">將 Beckman 出貨單 PDF 上傳至 Google Drive 指定資料夾，觸發 PDF.py，Gemini AI 自動辨識並轉成試算表。人工確認資料正確後，再觸發試劑入庫.py 自動填寫入庫資訊。</p>
+      </div>
+      <div class="timeline-item">
+        <p class="timeline-time">每月月初</p>
+        <p class="timeline-title">新月份試算表自動建立 <span class="timeline-badge badge-auto">自動</span></p>
+        <p class="timeline-desc">每月第一次執行庫存盤點時，程式自動建立當月的 Stock_YYYY_MM 試算表，並從上個月的分頁複製「每月耗材訂單」與「DXI 專車訂單」的固定品項清單，訂購量自動歸零，等待當月填寫。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 四、功能模組 -->
+  <section>
+    <p class="section-eyebrow">功能模組</p>
+    <h2>系統包含哪些功能？</h2>
+    <p>共八支腳本，功能分工清楚，共用底層模組（utils.py）維護，任何一支出問題不會連帶影響其他腳本。</p>
+
+    <div class="module-list">
+      <div class="module-item">
+        <p class="module-name">每日庫存盤點 · 每日 07:30 自動執行</p>
+        <p class="module-detail">爬取保吉系統庫存數據，比對警戒值，更新 Google 試算表當日分頁與低庫存補貨清單，新增低庫存時發送 LINE 通知。</p>
+      </div>
+      <div class="module-item">
+        <p class="module-name">急訂單 / 專車訂單 / 耗材訂單 · 手動觸發（三種參數共用一支腳本）</p>
+        <p class="module-detail">從對應 Google 試算表分頁讀取品項與訂購量，自動逐筆搜尋並填入保吉訂購系統。數量為 0 或空白自動跳過並記錄；填寫失敗不會強制送出，執行完成後印出摘要。</p>
+      </div>
+      <div class="module-item">
+        <p class="module-name">PDF 出貨單辨識 · 手動觸發</p>
+        <p class="module-detail">下載 Google Drive 上的 Beckman 出貨單 PDF，透過 Gemini AI 辨識品項編號、批號、效期、數量，輸出為 Google 試算表。出貨單格式異動通常不需要修改程式碼。</p>
+      </div>
+      <div class="module-item">
+        <p class="module-name">試劑入庫 · 手動觸發（人工確認後執行）</p>
+        <p class="module-detail">讀取 PDF 辨識後的試算表，自動登入保吉系統填入批號、效期、數量並送出入庫。效期空白者自動補上執行當日起一年（適用無效期限制的耗材）；格式有誤者填入 0000-00-00 標記供人工核對。</p>
+      </div>
+      <div class="module-item">
+        <p class="module-name">新批號及文件更新 · 手動觸發</p>
+        <p class="module-detail">盤點多批號在庫品項，標記最新批號（NEW LOT），自動搜尋 Beckman 官網繁體中文說明書 PDF 連結並以 HYPERLINK 公式寫入。同步更新短效期清單（60 天內到期品項），每次執行必定更新，不論當天是否有新批號。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 五、風控與稽核設計 -->
+  <section>
+    <p class="section-eyebrow">風險控制</p>
+    <h2>自動化的同時如何確保準確性？</h2>
+    <p>自動化不等於無監督。這套系統在設計時刻意保留了幾個人工確認節點，避免錯誤被自動放大。</p>
+
+    <table class="audit-table">
+      <thead>
+        <tr>
+          <th>環節</th>
+          <th>風險點</th>
+          <th>應對設計</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>AI 出貨單辨識</td>
+          <td>批號、效期辨識錯誤</td>
+          <td>PDF 轉換與試劑入庫拆成兩支獨立腳本，中間保留人工確認試算表的步驟，確認無誤再執行入庫</td>
+        </tr>
+        <tr>
+          <td>訂單送出</td>
+          <td>數量填錯或誤送出</td>
+          <td>數量為 0 或無法解析者自動跳過並記錄；填寫失敗不會強制點送出；每筆執行完印出三組統計摘要供核對</td>
+        </tr>
+        <tr>
+          <td>效期輸入</td>
+          <td>AI 辨識日期格式錯誤</td>
+          <td>效期解析加入年月日合理性驗證，格式錯誤填入 0000-00-00 而非猜測一個看似正確的錯誤日期</td>
+        </tr>
+        <tr>
+          <td>月初建檔</td>
+          <td>新月份試算表不存在導致資料遺失</td>
+          <td>程式自動建立當月試算表並從上月複製固定品項分頁，多批號清單完整保留不歸零（避免誤判為全新批號）</td>
+        </tr>
+        <tr>
+          <td>LINE 通知</td>
+          <td>重複通知造成干擾</td>
+          <td>只有「新增的」低庫存品項才會發送通知，已知的低庫存品項不重複推播</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 六、技術需求 -->
+  <section>
+    <p class="section-eyebrow">技術架構</p>
+    <h2>系統運作需要哪些環境？</h2>
+    <p>這套系統建立在幾個免費或低成本的雲端服務之上，不需要架設自己的伺服器，所有排程與腳本執行都在 GitHub Actions 上完成。</p>
+
+    <div class="req-grid">
+      <div class="req-block">
+        <p class="req-block-title">雲端服務</p>
+        <ul>
+          <li>Google Sheets（庫存試算表）</li>
+          <li>Google Drive（PDF 儲存）</li>
+          <li>GitHub Actions（排程執行環境）</li>
+          <li>LINE Messaging API（推播通知）</li>
+          <li>Gemini AI API（出貨單辨識）</li>
+        </ul>
+      </div>
+      <div class="req-block">
+        <p class="req-block-title">憑證管理</p>
+        <ul>
+          <li>GCP 服務帳戶金鑰（日常讀寫）</li>
+          <li>個人 Gmail OAuth 憑證（建立新檔案用）</li>
+          <li>保吉系統帳號密碼</li>
+          <li>LINE Token</li>
+          <li>以上均存放於 GitHub Secrets</li>
+        </ul>
+      </div>
+      <div class="req-block">
+        <p class="req-block-title">腳本語言與主要套件</p>
+        <ul>
+          <li>Python 3.10</li>
+          <li>Selenium（網頁操作）</li>
+          <li>gspread（Google Sheets 存取）</li>
+          <li>google-genai（Gemini AI）</li>
+          <li>pandas（資料處理）</li>
+        </ul>
+      </div>
+      <div class="req-block">
+        <p class="req-block-title">注意事項</p>
+        <ul>
+          <li>OAuth Token 需設為「正式版」避免 7 天過期</li>
+          <li>服務帳戶儲存配額為 0，建檔須用個人帳戶</li>
+          <li>新建試算表須共用給服務帳戶方可讀寫</li>
+          <li>GitHub Actions 外部排程不受閒置停用影響</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 七、導入建議 -->
+  <section>
+    <p class="section-eyebrow">導入建議</p>
+    <h2>其他實驗室如何開始？</h2>
+    <p>這套系統是從實際日常工作痛點出發建立的，如果您的實驗室也在使用保吉庫存系統與 Google Workspace，以下是建議的導入順序。</p>
+
+    <div class="phase-steps">
+      <div class="phase-step">
+        <div class="phase-num">1</div>
+        <div>
+          <p class="phase-content-title">建立基礎設施</p>
+          <p class="phase-content-desc">申請 GCP 服務帳戶、設定 Google Sheets 試算表結構（rule 分頁填入品名、保吉編號、警戒值、訂購量）、建立 LINE Messaging API 頻道、取得 Gemini API 金鑰，全部存入 GitHub Secrets。</p>
+        </div>
+      </div>
+      <div class="phase-step">
+        <div class="phase-num">2</div>
+        <div>
+          <p class="phase-content-title">先跑「每日庫存盤點」</p>
+          <p class="phase-content-desc">這是整個系統的資料來源，建議先把這支跑穩，確認能正確抓取庫存數據、寫入試算表、發送 LINE 通知，再往下推進其他功能。</p>
+        </div>
+      </div>
+      <div class="phase-step">
+        <div class="phase-num">3</div>
+        <div>
+          <p class="phase-content-title">接入訂單腳本</p>
+          <p class="phase-content-desc">在 Google 試算表建立「每月耗材訂單」和「DXI 專車訂單」分頁，填入你們實驗室的固定採購品項，先用少量品項手動測試，確認下單流程正確後再正式使用。</p>
+        </div>
+      </div>
+      <div class="phase-step">
+        <div class="phase-num">4</div>
+        <div>
+          <p class="phase-content-title">導入 PDF 入庫流程</p>
+          <p class="phase-content-desc">上傳一張真實的 Beckman 出貨單測試 AI 辨識效果，確認欄位對應正確、效期格式能被正常解析，再正式納入入庫 SOP。建議第一次由熟悉系統的人全程陪同確認。</p>
+        </div>
+      </div>
+      <div class="phase-step">
+        <div class="phase-num">5</div>
+        <div>
+          <p class="phase-content-title">調整警戒值與訂購量</p>
+          <p class="phase-content-desc">運行一到兩個月後，根據實際消耗速率微調 rule 分頁的警戒值設定，讓低庫存預警的時間點更符合你們實驗室的補貨週期，這是讓系統真正「貼合實際運作」最重要的調整。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  本文件根據台中醫院醫學檢驗科 Beckman Coulter 試劑庫存自動化管理系統實際運作整理<br>
+  系統使用 Python · GitHub Actions · Google Workspace · Gemini AI 建構<br>
+  如需進一步交流，歡迎聯繫
+</footer>
+
+</body>
+</html>
